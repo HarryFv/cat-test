@@ -10,8 +10,8 @@
 
         :root {
             --bg-color: #0F1A14;
-            --img: #E9E0D8;
-            --edit: #989386;
+            --img1: #E9E0D8;
+            --edit1: #989386;
             --font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --button-radius: 6px;
             --button-color: #E9E0D8;
@@ -27,16 +27,12 @@
             --fs-brand: clamp(18px, 2.4vh + 0.8vh, 36px);
             --fs-tooltip: clamp(12px, 1vh + 0.6vh, 16px);
 
-            --site-cart-width: 30%;
-            --site-cart-gap-left: 2vh;
-            /* gap between header right edge and cart left edge */
-            --site-cart-gap-right: 0px;
-            /* gap between cart right edge and viewport right edge */
-            --site-cart-top: 0px;
-            /* distance from viewport top to cart top */
-            --site-cart-bottom: 0px;
-            /* distance from viewport bottom to cart bottom */
-            --site-cart-ease: cubic-bezier(.22, .9, .28, 1);
+            --site-cart-width: 29%;
+      --site-cart-gap-left: 1.2vh;   /* gap between header right edge and cart left edge */
+      --site-cart-gap-right: 2.2vh;  /* gap between cart right edge and viewport right edge */
+      --site-cart-top: 1.8vh;        /* distance from viewport top to cart top */
+      --site-cart-bottom: 7.6vh;     /* distance from viewport bottom to cart bottom */
+      --site-cart-ease: cubic-bezier(.22,.9,.28,1);
         }
 
         .special-header {
@@ -333,7 +329,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border-radius: 0.8vh 0 0 0.8vh;
+            border-radius: 0.8vh;
             box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
             z-index: 2147483647;
             will-change: transform, opacity;
@@ -439,31 +435,51 @@
         }
 
         .cart-item {
-                background: var(--edit);
-                width: 100%;
-                height: 14vh;
-                border-radius: 1vh;
+            background: var(--edit1);
+            width: 100%;
+            height: 14vh;
+            border-radius: 1vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
 
-                .cart-item-title {
+        .cart-item-delete {
+            position: absolute;
+            top: 0.7vh;
+            right: 0.7vh;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.4vh;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 1.2rem 1.2rem 1rem;
+            justify-content: center;
+            opacity: 0.75;
+            transition: opacity var(--transition-fast);
+        }
+
+        .cart-item-delete:hover {
+            opacity: 1;
+        }
+
+        .cart-item-info {
+            padding: 0 1rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.15rem;
+        }
+
+        .cart-item-design {
+            font-weight: 300;
+            font-size: clamp(12px, 1.4vh, 16px);
+        }
+
+        .cart-item-title {
             font-weight: 600;
             font-size: clamp(15px, 2vh, 20px);
-            flex-shrink: 0;
-            /* Make bottom left of box */
-        }
-            .cart-item-design {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.2rem 1.2rem 1rem;
-            font-weight: 300;
-            font-size: clamp(15px, 1.6vh, 20px);
-            flex-shrink: 0;
-            /* Make bottom left of box above title */
         }
 
     </style>
@@ -534,10 +550,13 @@
 
         <div class="cart-body" id="site-cart-content">
             <div class="cart-item">
-               <div class="cart-item-title">Horizon               
-            </div> 
-               <div class="cart-item-design">Fluid              
-            </div> 
+                <button type="button" class="cart-item-delete" aria-label="Remove item">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#2C4C3B"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                </button>
+                <div class="cart-item-info">
+                    <div class="cart-item-design">Fluid</div>
+                    <div class="cart-item-title">Horizon</div>
+                </div>
             </div>
         </div>
 

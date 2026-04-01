@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Paddle Header</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #0F1A14;
+            --img: #E9E0D8;
+            --edit: #989386;
+            --font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --button-radius: 6px;
+            --button-color: #E9E0D8;
+            --button-hover-bg: #E9E0D8;
+            --button-hover-color: #E9E0D8;
+
+            --transition-fast: 220ms cubic-bezier(.25, .8, .25, 1);
+            --transition-smooth: 360ms cubic-bezier(.22, .9, .28, 1);
+            --fs-button: clamp(13px, 1vh + 1vh, 20px);
+            --pbtn-size: clamp(36px, 3.6vh, 56px);
+            --icon-size: calc(var(--pbtn-size) * 0.64);
+            --icon-stroke: 2.4;
+            --fs-brand: clamp(18px, 2.4vh + 0.8vh, 36px);
+            --fs-tooltip: clamp(12px, 1vh + 0.6vh, 16px);
+
+            --site-cart-width: 30%;
+            --site-cart-gap-left: 2vh;
+            /* gap between header right edge and cart left edge */
+            --site-cart-gap-right: 0px;
+            /* gap between cart right edge and viewport right edge */
+            --site-cart-top: 0px;
+            /* distance from viewport top to cart top */
+            --site-cart-bottom: 0px;
+            /* distance from viewport bottom to cart bottom */
+            --site-cart-ease: cubic-bezier(.22, .9, .28, 1);
+        }
+
+        .special-header {
+            width: 100%;
+            padding: 1.6vh;
+            background: var(--bg-color);
+            color: #fff;
+            font-family: var(--font-family);
+            border-radius: 0.8vh;
+            display: flex;
+            align-items: stretch;
+            box-sizing: border-box;
+            gap: 1vh;
+            position: relative;
+            z-index: 2147483647;
+        }
+
+        .special-header-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 0;
+            gap: 0.8vh;
+        }
+
+        .special-header-section.left {
+            justify-content: flex-start;
+        }
+
+        .special-header-section.center {
+            justify-content: center;
+        }
+
+        .special-header-section.right {
+            justify-content: flex-end;
+        }
+
+        .brand {
+            line-height: 1;
+            font-weight: 400;
+            user-select: none;
+            color: #ECF4EF;
+            font-size: var(--fs-brand);
+            text-decoration: none;
+            /* remove default link underline when brand is an anchor */
+            display: inline-block;
+        }
+
+        .brand:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+            border-radius: 6px;
+        }
+
+        .p-button {
+            --pad-v: 1vh;
+            --pad-h: 1vh;
+            padding: calc(var(--pad-v) - 0.2vh) calc(var(--pad-h) + 0.2vh);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--button-radius);
+            cursor: pointer;
+            box-sizing: border-box;
+            color: var(--button-color);
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--transition-fast), color var(--transition-fast);
+            font-family: inherit;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .p-button:hover,
+        .p-button:focus,
+        .p-button[aria-expanded="true"] {
+            color: var(--button-hover-color);
+            background: var(--button-hover-bg);
+            outline: none;
+        }
+
+        .p-button:focus-visible {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+        }
+
+        .p-button-text {
+            padding: 0;
+            border-radius: 3px;
+            display: inline-block;
+            line-height: 1;
+            white-space: nowrap;
+            transform: translateX(0);
+            transition: transform var(--transition-smooth);
+            will-change: transform;
+            font-weight: 500;
+            font-size: var(--fs-button);
+            pointer-events: none;
+        }
+
+        .p-button .p-button-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(160%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+            will-change: transform, opacity;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .p-button .p-button-icon-inner {
+            display: inline-block;
+            transform: translateY(0);
+        }
+
+        .p-button .p-button-icon svg {
+            display: block;
+            width: calc(var(--fs-button) * 0.9);
+            height: calc(var(--fs-button) * 0.9);
+        }
+
+        @keyframes bob {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10%);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .p-button:hover .p-button-text,
+        .p-button:focus .p-button-text {
+            transform: translateX(-140%);
+        }
+
+        .p-button:hover .p-button-icon,
+        .p-button:focus .p-button-icon {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+
+        .p-button:hover .p-button-icon-inner,
+        .p-button:focus .p-button-icon-inner {
+            animation: bob 800ms ease-in-out 120ms infinite;
+        }
+
+        .special-header-section.right>.p-button+.p-button {
+            margin-left: 0.8vh;
+        }
+
+        .p-icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--button-radius);
+            cursor: pointer;
+            margin-left: 0.8vh;
+            box-sizing: border-box;
+            color: var(--button-color);
+            background: transparent;
+            position: relative;
+            overflow: visible;
+            transition: background var(--transition-fast), color var(--transition-fast);
+            font-family: inherit;
+            line-height: 1;
+            user-select: none;
+
+            height: var(--pbtn-size);
+            width: var(--pbtn-size);
+            padding: 0;
+            min-width: 0;
+            flex: 0 0 auto;
+        }
+
+        .p-icon-button:hover,
+        .p-icon-button:focus,
+        .p-icon-button[aria-expanded="true"] {
+            color: var(--button-hover-color);
+            background: var(--button-hover-bg);
+            outline: none;
+        }
+
+        .p-icon-button:focus-visible {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14);
+        }
+
+        .p-icon-button .p-button-icon {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            pointer-events: none;
+            transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+        }
+
+        .p-icon-button .p-button-icon-inner {
+            display: inline-block;
+            transform: translateY(0);
+        }
+
+        .p-icon-button .p-button-icon svg {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            display: block;
+            vertical-align: middle;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: var(--icon-stroke);
+        }
+
+        .p-icon-button:hover .p-button-icon-inner,
+        .p-icon-button:focus .p-button-icon-inner {
+            animation: bob 800ms ease-in-out 120ms infinite;
+        }
+
+        .TopbarTooltip {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            display: inline-block;
+            background: rgba(10, 18, 14, 0.95);
+            color: #ECF4EF;
+            font-family: var(--font-family);
+            font-size: var(--fs-tooltip);
+            padding: 0.45vh 0.8vh;
+            border-radius: 0.8vh;
+            box-shadow: 0 0.6vh 1.0vh rgba(0, 0, 0, 0.45);
+            transform-origin: left top;
+            transform: translate3d(0, 0, 0) scale(0.96);
+            transition: opacity 120ms ease, transform 120ms ease;
+            opacity: 0;
+            white-space: nowrap;
+            will-change: transform, opacity, left, top;
+        }
+
+        .TopbarTooltip.visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+
+        /* ── Cart backdrop ──────────────────────────────────────────────────── */
+        #site-cart-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2147483646;
+            /* one below the cart drawer */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 360ms var(--site-cart-ease);
+        }
+
+        #site-cart-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ── Cart panel ─────────────────────────────────────────────────────── */
+
+        /* Header shifts left when cart is open, leaving a gap equal to --site-cart-gap-left */
+        .special-header {
+            transition: margin-right 360ms var(--site-cart-ease),
+                width 360ms var(--site-cart-ease);
+        }
+
+        .special-header.cart-is-open {
+            width: calc(100% - var(--site-cart-width) - var(--site-cart-gap-right) - var(--site-cart-gap-left));
+            margin-right: calc(var(--site-cart-width) + var(--site-cart-gap-right) + var(--site-cart-gap-left));
+        }
+
+        /* Full-height drawer anchored to the right edge of the viewport */
+        #site-cart-drawer {
+            position: fixed;
+            top: var(--site-cart-top);
+            right: var(--site-cart-gap-right);
+            bottom: var(--site-cart-bottom);
+            width: var(--site-cart-width);
+            background: var(--img);
+            color: #2C4C3B;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 0.8vh 0 0 0.8vh;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+            z-index: 2147483647;
+            will-change: transform, opacity;
+            transform: translate3d(calc(100% + var(--site-cart-gap-right) + 4px), 0, 0);
+            opacity: 0;
+            transition: transform 360ms var(--site-cart-ease),
+                opacity 260ms var(--site-cart-ease);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-family: var(--font-family);
+        }
+
+        #site-cart-drawer.open {
+            transform: translate3d(0, 0, 0);
+            opacity: 1;
+        }
+
+        /* Cart inner sections */
+        #site-cart-drawer .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.2rem 1rem;
+            border-bottom: 1px solid rgba(44, 76, 59, 0.08);
+            font-weight: 600;
+            font-size: clamp(15px, 1.6vh, 20px);
+            flex-shrink: 0;
+        }
+
+        #site-cart-drawer .cart-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 1.2rem;
+            background: var(--img);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #site-cart-drawer .cart-footer {
+            flex-shrink: 0;
+            padding: 1rem 1.2rem;
+            border-top: 1px solid rgba(44, 76, 59, 0.08);
+            background: var(--img);
+        }
+
+        #site-cart-drawer .cart-empty {
+            color: rgba(44, 76, 59, 0.55);
+            font-size: clamp(13px, 1.4vh, 16px);
+            margin-top: 0.4rem;
+        }
+
+        /* Close button inside the cart */
+        #site-cart-drawer .cart-close-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--pbtn-size);
+            height: var(--pbtn-size);
+            border: none;
+            background: transparent;
+            color: #2C4C3B;
+            border-radius: var(--button-radius);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background var(--transition-fast);
+        }
+
+        #site-cart-drawer .cart-close-btn:hover,
+        #site-cart-drawer .cart-close-btn:focus {
+            background: rgba(44, 76, 59, 0.08);
+            outline: none;
+        }
+
+        #site-cart-drawer .cart-close-btn:focus-visible {
+            box-shadow: 0 0 0 3px rgba(44, 76, 59, 0.18);
+        }
+
+        #site-cart-drawer .cart-close-btn svg {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            stroke: currentColor;
+            fill: none;
+            stroke-width: var(--icon-stroke);
+            display: block;
+        }
+
+        /* Checkout button */
+        #site-cart-drawer .cart-checkout-btn {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border-radius: var(--button-radius);
+            background: #1E3428;
+            color: #ECF4EF;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-size: clamp(13px, 1.4vh, 16px);
+            font-weight: 500;
+            transition: background var(--transition-fast);
+        }
+
+        #site-cart-drawer .cart-checkout-btn:hover {
+            background: #2C4C3B;
+        }
+
+        .cart-item {
+                background: var(--edit);
+                width: 100%;
+                height: 14vh;
+                border-radius: 1vh;
+        }
+
+                .cart-item-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.2rem 1rem;
+            font-weight: 600;
+            font-size: clamp(15px, 2vh, 20px);
+            flex-shrink: 0;
+            /* Make bottom left of box */
+        }
+            .cart-item-design {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.2rem 1rem;
+            font-weight: 300;
+            font-size: clamp(15px, 1.6vh, 20px);
+            flex-shrink: 0;
+            /* Make bottom left of box above title */
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="special-header cart-is-open" role="banner">
+        <div class="special-header-section left">
+            <!-- Brand now links to your home page -->
+            <a class="brand" href="https://jvhjljda.elementor.cloud/" aria-label="Home">Paddle</a>
+        </div>
+
+        <div class="special-header-section center"></div>
+
+        <div class="special-header-section right" role="navigation" aria-label="Header actions">
+            <div class="p-button" role="button" tabindex="0" aria-label="Products" data-action="products" data-tooltip="Products">
+                <span class="p-button-text">Products</span>
+                <span class="p-button-icon" aria-hidden="true">
+                    <span class="p-button-icon-inner" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <polyline points="5,3 11,8 5,13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <div class="p-button" role="button" tabindex="0" aria-label="Contact" data-action="contact" data-tooltip="Contact">
+                <span class="p-button-text">Contact</span>
+                <span class="p-button-icon" aria-hidden="true">
+                    <span class="p-button-icon-inner" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <polyline points="5,3 11,8 5,13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <div class="p-icon-button" role="button" tabindex="0" aria-label="Cart" data-action="cart" data-tooltip="Cart">
+                <span class="p-button-icon" aria-hidden="true">
+                    <span class="p-button-icon-inner" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23.45 31" aria-hidden="true" focusable="false" role="img">
+                            <path d="M21,19.9v-10.49c0-.83-.67-1.51-1.51-1.51H2.51c-.83,0-1.51.67-1.51,1.51v16.99c0,.83.67,1.51,1.51,1.51h10.49" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" />
+                            <path d="M5,6.9C5,3.59,7.69.9,11,.9c3.31,0,6,2.69,6,6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" />
+                            <line x1="17" y1="27.9" x2="17" y2="19.9" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+                            <line x1="13" y1="23.9" x2="21" y2="23.9" stroke="currentColor" stroke-linecap="round" stroke-width="1.8.8" />
+                        </svg>
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Cart backdrop ─────────────────────────────────────────────────── -->
+    <div id="site-cart-backdrop" class="open" aria-hidden="false"></div>
+
+    <!-- ── Cart drawer (lives inside the header file) ─────────────────────── -->
+    <div id="site-cart-drawer" class="open" role="dialog" aria-modal="true" aria-hidden="false" aria-label="Shopping cart">
+
+        <div class="cart-header">
+            <span>Your Cart</span>
+            <button type="button" class="cart-close-btn" aria-label="Close cart" data-action="close-cart">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="cart-body" id="site-cart-content">
+            <div class="cart-item">
+               <div class="cart-item-title">Horizon               
+            </div> 
+               <div class="cart-item-design">Fluid              
+            </div> 
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <button type="button" class="cart-checkout-btn">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const pButtons = document.querySelectorAll('.p-button, .p-icon-button');
+
+            function activate(el) {
+                const action = el.getAttribute('data-action') || null;
+                el.dispatchEvent(new CustomEvent('pbutton:activate', {
+                    detail: {
+                        action
+                    },
+                    bubbles: true
+                }));
+                el.setAttribute('aria-pressed', 'true');
+                setTimeout(() => el.removeAttribute('aria-pressed'), 150);
+            }
+
+            pButtons.forEach(el => {
+                el.addEventListener('click', () => activate(el));
+                el.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter' || ev.key === ' ' || ev.key === 'Spacebar') {
+                        ev.preventDefault();
+                        activate(el);
+                    }
+                });
+            });
+        })();
+    </script>
+
+    <script>
+        (function() {
+            const TOOLTIP_ID = 'header-shared-tooltip';
+            let tooltip = document.getElementById(TOOLTIP_ID);
+
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = TOOLTIP_ID;
+                tooltip.className = 'TopbarTooltip';
+                tooltip.setAttribute('role', 'tooltip');
+                tooltip.setAttribute('aria-hidden', 'true');
+                document.body.appendChild(tooltip);
+            }
+
+            const MARGIN = 8;
+            const CURSOR_OFFSET_X = 12;
+            const CURSOR_OFFSET_Y = -12;
+
+            function getTooltipText(btn) {
+                return btn.getAttribute('data-tooltip') ||
+                    btn.getAttribute('data-label') ||
+                    (btn.querySelector && (btn.querySelector('.p-button-text') ? btn.querySelector('.p-button-text').textContent.trim() : '')) ||
+                    btn.getAttribute('aria-label') || '';
+            }
+
+            function clampPosition(left, top, width, height) {
+                const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+                const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                let x = left,
+                    y = top;
+                if (x < MARGIN) x = MARGIN;
+                if (y < MARGIN) y = MARGIN;
+                if (x + width + MARGIN > vw) x = Math.max(MARGIN, vw - width - MARGIN);
+                if (y + height + MARGIN > vh) y = Math.max(MARGIN, vh - height - MARGIN);
+                return {
+                    x,
+                    y
+                };
+            }
+
+            function positionAtPointer(clientX, clientY) {
+                // place tooltip near the pointer; read its size, clamp to viewport
+                tooltip.style.left = '0px';
+                tooltip.style.top = '0px';
+                const rect = tooltip.getBoundingClientRect();
+                const desiredLeft = Math.round(clientX + CURSOR_OFFSET_X);
+                const desiredTop = Math.round(clientY + CURSOR_OFFSET_Y - rect.height);
+                const clamped = clampPosition(desiredLeft, desiredTop, rect.width, rect.height);
+                tooltip.style.left = clamped.x + 'px';
+                tooltip.style.top = clamped.y + 'px';
+            }
+
+            function positionAboveElement(el) {
+                tooltip.style.left = '0px';
+                tooltip.style.top = '0px';
+                const rect = tooltip.getBoundingClientRect();
+                const btnRect = el.getBoundingClientRect();
+                const desiredLeft = Math.round(btnRect.left + (btnRect.width - rect.width) / 2);
+                const desiredTop = Math.round(btnRect.top - rect.height - 8);
+                const clamped = clampPosition(desiredLeft, desiredTop, rect.width, rect.height);
+                tooltip.style.left = clamped.x + 'px';
+                tooltip.style.top = clamped.y + 'px';
+            }
+
+            let currentTarget = null;
+            // store most recent pointer coordinates so focus (from a pointer click) can reuse them
+            let lastPointer = null;
+
+            function showTooltip(text) {
+                tooltip.textContent = text;
+                tooltip.setAttribute('aria-hidden', 'false');
+                tooltip.classList.add('visible');
+            }
+
+            function hideTooltip() {
+                tooltip.setAttribute('aria-hidden', 'true');
+                tooltip.classList.remove('visible');
+                currentTarget = null;
+                // don't zero lastPointer here — keep it until pointerleave to allow click -> focus to use it
+            }
+
+            function withinButton(pt, btn) {
+                if (!pt) return false;
+                const r = btn.getBoundingClientRect();
+                return pt.x >= r.left && pt.x <= r.right && pt.y >= r.top && pt.y <= r.bottom;
+            }
+
+            function attachToButton(btn) {
+                if (!btn || btn.dataset._ttInit === '1') return;
+                btn.dataset._ttInit = '1';
+
+                function onPointerEnter(e) {
+                    const text = getTooltipText(btn);
+                    if (!text) return;
+                    lastPointer = {
+                        x: e.clientX,
+                        y: e.clientY
+                    };
+                    currentTarget = btn;
+                    showTooltip(text);
+                    positionAtPointer(e.clientX, e.clientY);
+                }
+
+                function onPointerMove(e) {
+                    // update last pointer coordinates so subsequent focus (from click) can reuse them
+                    lastPointer = {
+                        x: e.clientX,
+                        y: e.clientY
+                    };
+                    if (currentTarget !== btn) return;
+                    positionAtPointer(e.clientX, e.clientY);
+                }
+
+                function onPointerLeave() {
+                    hideTooltip();
+                    lastPointer = null;
+                }
+
+                function onFocus() {
+                    const text = getTooltipText(btn);
+                    if (!text) return;
+                    currentTarget = btn;
+                    showTooltip(text);
+                    // If the element was focused via a pointer (mouse) and we have recent pointer coords
+                    // prefer positioning at the pointer so the tooltip continues to follow the mouse.
+                    // Otherwise (keyboard focus), position above the element.
+                    if (lastPointer && withinButton(lastPointer, btn)) {
+                        positionAtPointer(lastPointer.x, lastPointer.y);
+                    } else {
+                        requestAnimationFrame(() => positionAboveElement(btn));
+                    }
+                }
+
+                function onBlur() {
+                    hideTooltip();
+                }
+
+                btn.addEventListener('pointerenter', onPointerEnter, {
+                    passive: true
+                });
+                btn.addEventListener('pointermove', onPointerMove, {
+                    passive: true
+                });
+                btn.addEventListener('pointerleave', onPointerLeave, {
+                    passive: true
+                });
+                btn.addEventListener('focus', onFocus, {
+                    passive: true
+                });
+                btn.addEventListener('blur', onBlur, {
+                    passive: true
+                });
+            }
+
+            Array.from(document.querySelectorAll('.p-button, .p-icon-button')).forEach(attachToButton);
+
+            const observer = new MutationObserver(function(mutations) {
+                for (const m of mutations) {
+                    for (const node of m.addedNodes) {
+                        if (!(node instanceof HTMLElement)) continue;
+                        if (node.matches && (node.matches('.p-button') || node.matches('.p-icon-button'))) attachToButton(node);
+                        node.querySelectorAll && node.querySelectorAll('.p-button, .p-icon-button').forEach(attachToButton);
+                    }
+                }
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            window.addEventListener('scroll', function() {
+                if (tooltip.classList.contains('visible') && currentTarget) requestAnimationFrame(function() {
+                    // if the tooltip is following the pointer, keep it where the pointer is (no pointer coords during scroll).
+                    // For simplicity reposition above the element on scroll if visible and focused.
+                    positionAboveElement(currentTarget);
+                });
+            }, {
+                passive: true
+            });
+
+            document.removeEventListener && document.removeEventListener('pbutton:activate', null);
+            document.addEventListener('pbutton:activate', (e) => {
+                try {
+                    if (!e || !e.detail || e.detail.action !== 'products') return;
+
+                    // Updated to use your shop page
+                    const url = 'https://jvhjljda.elementor.cloud/shop/';
+
+                    window.location.assign(url);
+
+                } catch (err) {
+                    try {
+                        window.location.href = 'https://jvhjljda.elementor.cloud/shop/';
+                    } catch (_) {}
+                }
+            });
+            window.addEventListener('resize', function() {
+                hideTooltip();
+            }, {
+                passive: true
+            });
+            window.addEventListener('blur', function() {
+                hideTooltip();
+            }, {
+                passive: true
+            });
+
+            window._headerTooltip = {
+                el: tooltip,
+                showFor: function(btnOrText) {
+                    if (typeof btnOrText === 'string') {
+                        showTooltip(btnOrText);
+                        // center in viewport when explicit string is provided (external callers)
+                        positionAtPointer(window.innerWidth / 2, window.innerHeight / 2);
+                    } else if (btnOrText instanceof HTMLElement) {
+                        const t = getTooltipText(btnOrText);
+                        showTooltip(t);
+                        // prefer pointer coordinates if available, otherwise position above the element
+                        if (lastPointer && withinButton(lastPointer, btnOrText)) {
+                            positionAtPointer(lastPointer.x, lastPointer.y);
+                        } else {
+                            positionAboveElement(btnOrText);
+                        }
+                    }
+                },
+                hide: hideTooltip
+            };
+        })();
+    </script>
+
+    <!-- ── Cart open / close logic ──────────────────────────────────────── -->
+    <script>
+        (function() {
+            var header = document.querySelector('.special-header');
+            var drawer = document.getElementById('site-cart-drawer');
+            var backdrop = document.getElementById('site-cart-backdrop');
+            var closeBtn = drawer && drawer.querySelector('[data-action="close-cart"]');
+            var focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+            var lastFocused = null;
+
+            function isOpen() {
+                return drawer && drawer.classList.contains('open');
+            }
+
+            function openCart(triggerBtn) {
+                if (!drawer || isOpen()) return;
+                lastFocused = document.activeElement;
+                drawer.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                if (backdrop) {
+                    backdrop.classList.add('open');
+                    backdrop.setAttribute('aria-hidden', 'false');
+                }
+                if (header) header.classList.add('cart-is-open');
+                var first = drawer.querySelector(focusableSelector);
+                (first || drawer).focus();
+            }
+
+            function closeCart() {
+                if (!drawer || !isOpen()) return;
+                drawer.classList.remove('open');
+                drawer.setAttribute('aria-hidden', 'true');
+                if (backdrop) {
+                    backdrop.classList.remove('open');
+                    backdrop.setAttribute('aria-hidden', 'true');
+                }
+                if (header) header.classList.remove('cart-is-open');
+                if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+                lastFocused = null;
+            }
+
+            // focus trap + ESC
+            function isVisible(el) {
+                return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (!isOpen()) return;
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeCart();
+                    return;
+                }
+                if (e.key === 'Tab') {
+                    var focusables = Array.from(drawer.querySelectorAll(focusableSelector)).filter(isVisible);
+                    if (!focusables.length) {
+                        e.preventDefault();
+                        return;
+                    }
+                    var first = focusables[0],
+                        last = focusables[focusables.length - 1];
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            });
+
+            // open on cart button click or pbutton:activate
+            document.addEventListener('click', function(e) {
+                var btn = e.target.closest && e.target.closest('[data-action="cart"]');
+                if (btn) {
+                    e.preventDefault();
+                    openCart(btn);
+                }
+            });
+            document.addEventListener('pbutton:activate', function(e) {
+                try {
+                    if (e && e.detail && e.detail.action === 'cart') openCart(e.target || null);
+                } catch (_) {}
+            });
+
+            if (closeBtn) closeBtn.addEventListener('click', closeCart);
+            if (backdrop) backdrop.addEventListener('click', closeCart);
+
+            // public API
+            window._siteCart = window._siteCart || {};
+            window._siteCart.open = openCart;
+            window._siteCart.close = closeCart;
+            window._siteCart.el = drawer;
+            window._siteCart.contentEl = document.getElementById('site-cart-content');
+            window._siteCart.setContent = function(html) {
+                if (window._siteCart.contentEl) window._siteCart.contentEl.innerHTML = html;
+            };
+        })();
+    </script>
+</body>
+
+</html>
